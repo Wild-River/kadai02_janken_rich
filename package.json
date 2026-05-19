@@ -1,0 +1,25 @@
+{
+  "name": "kadai02_janken_rich",
+  "version": "1.0.0",
+  "description": "![screenShot](./img/screenShot.webp)",
+  "homepage": "https://github.com/Wild-River/kadai02_janken_rich#readme",
+  "bugs": {
+    "url": "https://github.com/Wild-River/kadai02_janken_rich/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Wild-River/kadai02_janken_rich.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx @tailwindcss/cli -i ./css/input.css -o ./css/output.css --watch"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "tailwindcss": "^4.3.0"
+  }
+}
