@@ -34,7 +34,7 @@ const anim = lottie.loadAnimation({
   renderer: 'svg',
   loop: false, // ループしない
   autoplay: false, // 自動再生しない
-  path: '../lottie/hammer.json',
+  path: 'lottie/hammer.json',
 });
 
 hammer.style.display = 'none';
@@ -198,10 +198,10 @@ HOLES.forEach((hole, index) => {
       const currentFile = moleImg.src.split('/').pop(); // ファイル名だけ取得
       const hitFile = moleHitMap[currentFile];
 
-      moleImg.src = `../img/${hitFile}`;
+      moleImg.src = `img/${hitFile}`;
 
       setTimeout(() => {
-        moleImg.src = `../img/${currentFile}`;
+        moleImg.src = `img/${currentFile}`;
       }, 600);
 
       setTimeout(() => {
