@@ -25,6 +25,8 @@ let level = 1;
 let timerId = null;
 let isActive = false;
 let currentLevel = 1;
+let difficulty = 2000; // 起動時の難易度
+
 showHistory();
 gameField.style.display = 'none';
 
@@ -133,23 +135,41 @@ setInterval(() => {
   statusEl.style.opacity = visible ? 1 : 0;
 }, 1000);
 
+const MOLE_TYPES = {
+  normal01: { img: 'mogura01.webp', hitImg: 'mogura01_hit.webp', point: 1, rare: false },
+  normal02: { img: 'mogura02.webp', hitImg: 'mogura02_hit.webp', point: 1, rare: false },
+  normal03: { img: 'mogura03.webp', hitImg: 'mogura03_hit.webp', point: 1, rare: false },
+  rare: { img: 'mogura_rare.webp', hitImg: 'mogura_rare_hit.webp', point: 5, rare: true },
+};
+
+function pickMoleType() {
+  if (Math.random() < 0.05) return MOLE_TYPES.rare; // レアモグラの出現頻度
+
+  // normalをランダムに1種選ぶ
+  const normals = [MOLE_TYPES.normal01, MOLE_TYPES.normal02, MOLE_TYPES.normal03];
+  return normals[Math.floor(Math.random() * normals.length)];
+}
+
 // - モグラが出る・引っ込む
 const HOLE_COUNT = 7;
 let holes = new Array(HOLE_COUNT).fill(false); //各穴に「モグラが出ているか」
 
 function activateMole() {
   let i = Math.floor(Math.random() * HOLE_COUNT);
-  let appearDelay = Math.floor(Math.random() * 1000);
+  const type = pickMoleType();
+  let appearDelay = Math.floor(Math.random() * 5000);
 
   setTimeout(() => {
-    showMole(i);
+    showMole(i, type);
   }, appearDelay);
 }
 
-function showMole(index) {
-  holes[index] = true;
+function showMole(index, type) {
+  holes[index] = type;
+  const moleImg = HOLES[index].querySelector('.mole');
+  moleImg.src = `img/${type.img}`;
   HOLES[index].querySelector('.mole').classList.add('active');
-  let stayDuration = Math.floor(Math.random() * 2000);
+  let stayDuration = Math.floor(Math.random() * difficulty); //モグラを表示する時間を調整することで難易度調整
 
   setTimeout(() => {
     hideMole(index);
@@ -165,21 +185,20 @@ function hideMole(index) {
   }
 }
 
-const moleHitMap = {
-  'mogura01.webp': 'mogura01_hit.webp',
-  'mogura02.webp': 'mogura02_hit.webp',
-  'mogura03.webp': 'mogura03_hit.webp',
-};
-
 // - モグラをクリックする → ヒット判定
 HOLES.forEach((hole, index) => {
   hole.addEventListener('click', function () {
     AUDIO.piko.play();
 
     if (holes[index]) {
-      score += 1;
-
-      message.textContent = 'ヒット！！';
+      const type = holes[index];
+      score += type.point;
+      navigator.vibrate?.(type.rare ? [100, 50, 100] : 100);
+      gameField.classList.add('shake');
+      setTimeout(() => {
+        gameField.classList.remove('shake');
+      }, 200);
+      message.textContent = type.rare ? `高得点！！ +${type.point.toLocaleString('ja-JP-u-nu-fullwide')}点獲得` : 'ヒット！！';
 
       const hitInterval = setInterval(() => {
         hitVisible = !hitVisible;
@@ -195,13 +214,10 @@ HOLES.forEach((hole, index) => {
 
       // 現在の画像からヒット画像を取得
       const moleImg = HOLES[index].querySelector('.mole');
-      const currentFile = moleImg.src.split('/').pop(); // ファイル名だけ取得
-      const hitFile = moleHitMap[currentFile];
-
-      moleImg.src = `img/${hitFile}`;
+      moleImg.src = `img/${type.hitImg}`;
 
       setTimeout(() => {
-        moleImg.src = `img/${currentFile}`;
+        moleImg.src = `img/${type.img}`;
       }, 600);
 
       setTimeout(() => {
@@ -230,6 +246,9 @@ function updateDisplay() {
   if (level > currentLevel) {
     AUDIO.fanfare.play();
     currentLevel = level;
+    if (difficulty > 500) {
+      difficulty -= 500;
+    }
     levelUpDisplay();
   }
   levelEl.textContent = level;
@@ -273,7 +292,9 @@ function startGame() {
       isActive = false;
       hammer.style.display = 'none';
       saveResult();
-      statusEl.textContent = 'ゲーム終了！  スコア：' + score + ' レベル：' + level;
+      statusEl.innerHTML = 'ゲーム終了！<br>スコア：' + score + '<br>レベル：' + level;
+      statusEl.classList.add('text-4xl');
+      statusEl.classList.remove('text-xl');
 
       setTimeout(() => {
         resetGame();
@@ -349,6 +370,8 @@ function resetGame() {
   updateDisplay();
   startBtn.style.display = 'inline-block';
   statusEl.textContent = 'スタートボタンを押してね！';
+  statusEl.classList.remove('text-4xl');
+  statusEl.classList.add('text-xl');
 }
 
 //ゲーム開始
