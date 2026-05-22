@@ -277,7 +277,7 @@ function startGame() {
 
       setTimeout(() => {
         resetGame();
-      }, 3000);
+      }, 5000);
     }
   }, 1000);
 
