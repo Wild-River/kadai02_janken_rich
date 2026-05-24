@@ -108,13 +108,6 @@ bgmBtns.forEach((btn) => {
   btn.addEventListener('click', () => {
     const track = `bgm${btn.dataset.bgm}`;
 
-    // 同じボタンをクリック → STOP
-    if (activeBgm === track) {
-      btn.classList.remove('ring-2', 'ring-white');
-      activeBgm = null;
-      return;
-    }
-
     // 別のBGMに切り替え
     activeBgm = track;
 
@@ -143,7 +136,7 @@ const MOLE_TYPES = {
 };
 
 function pickMoleType() {
-  if (Math.random() < 0.05) return MOLE_TYPES.rare; // レアモグラの出現頻度
+  if (Math.random() < 0.1) return MOLE_TYPES.rare; // レアモグラの出現頻度
 
   // normalをランダムに1種選ぶ
   const normals = [MOLE_TYPES.normal01, MOLE_TYPES.normal02, MOLE_TYPES.normal03];
@@ -310,7 +303,13 @@ function saveResult() {
   const result = {
     score: score,
     level: level,
-    date: new Date().toLocaleDateString('ja-JP'),
+    datetime: new Date().toLocaleString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
   };
 
   // 既存の履歴を取得
@@ -337,7 +336,7 @@ function showHistory() {
     return Number(b.score) - Number(a.score);
   });
 
-  historyList.innerHTML = sorted.map((r, i) => `<li>${i + 1}位　${r.date}　スコア: ${r.score}　レベル: ${r.level}</li>`).join('');
+  historyList.innerHTML = sorted.map((r, i) => `<li>${i + 1}位　${r.datetime}　スコア: ${r.score}　レベル: ${r.level}</li>`).join('');
 }
 
 // 説明ボタンクリックで履歴を表示
